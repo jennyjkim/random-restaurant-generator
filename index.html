@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+
+<head>
+	<title> Where to EAT</title> 
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:100,200,300,400,700" rel="stylesheet">
+
+	<meta charset = "utf-8">
+
+
+	<style>
+	body
+	{
+		font-family: 'Open Sans';
+	}
+
+	* {
+		margin: 0px;
+		padding: 0px;
+	}
+
+	#header
+	{
+		background-color: #0066cc;
+	}
+
+	#title
+	{
+		font-size: 50px;
+		width: 100%;
+		text-align: center;
+		margin-top: 20px;
+	}
+
+	#title2
+	{
+		margin-bottom: 20px;
+		font-size: 20px;
+	}
+
+	#suggestion 
+	{
+		font-size: 24px;
+		width: 100%;
+		text-align: center;
+		margin-top: 10px;
+		margin-bottom: 20px;
+		font-weight: 200;
+		font-family: 'Open Sans';
+	}
+
+	#map
+	{
+		width: 70%;
+		height: 350px;
+	}
+
+	#new
+	{
+		width:220px;
+		font-weight: 600;
+		font-family: 'Open Sans';
+		height:30px;
+		font-size: 18px;
+		background-color: #ffcc00
+;
+		border-radius: 4px;
+		color:#fff;
+		text-align:center;
+		padding:10px;
+		padding-top:15px;
+		margin-top:40px;
+		cursor:pointer;
+		transition-duration: 0.4s;
+	}
+
+	#new:hover {
+		border: 3px solid #ffcc00
+;
+		background-color: white;
+		color: #ffcc00
+;
+	}
+
+	#footer
+	{
+		position: fixed;
+		width: 100%;
+		bottom: 10px;
+		font-size: 12px;
+
+
+	}
+
+	</style>
+</head>
+
+	<body> 
+	<div id="header">.</div>
+	<div id="title"> <span style="font-weight: 200;">Where to </span> <strong>EAT</strong> </div>
+	<div id="title2"><center> — at UCI — </center></div>
+	<div id="suggestion"></div>
+
+	<center>
+		<div id="map"></div>
+		<div id="new">I'm hungry !!</div>
+		<div id="footer"> <em>Created by Jennifer Kim </em> </div>
+	</center>
+
+</body>
+
+<script>
+var map;
+var markers = [];
+var infowindow;
+
+function getRandomInt(min, max) 
+{
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function addMarker(location,content)
+{
+	for (var i = 0; i < markers.length; i++) 
+	{
+		markers[i].setMap(null); 
+    }
+	marker = new google.maps.Marker({ 
+		position: location, 
+		map: map,
+	});
+	markers.push(marker); 
+
+	contentString = "<h3>"+content+"</h3>"; 
+	
+	infowindow = new google.maps.InfoWindow({ 
+		content: contentString 
+	});
+	marker.addListener('click', function() { 
+		infowindow.open(map, marker); 
+	});
+}
+
+var restaurants = [];
+
+
+$.getJSON('https://crossorigin.me/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=33.640,-117.844&rankby=distance&types=food&key=AIzaSyAFAmmcG3PXNTzGJENn41sz6ePkIBtwmuU', function(data) { 
+	for(var i = 0; i<data.results.length;i++)
+	{
+		var temp = []; 
+		temp.push(data.results[i].name); 
+		temp.push(data.results[i].geometry.location.lat); 
+		temp.push(data.results[i].geometry.location.lng); 
+		restaurants.push(temp);
+	}
+	var randomNum = getRandomInt(0, restaurants.length-1) 
+	randomRestaurant = restaurants[randomNum];
+	restaurantLocation = new google.maps.LatLng(randomRestaurant[1], randomRestaurant[2]);
+
+	console.log(randomRestaurant);
+	addMarker(restaurantLocation, randomRestaurant[0]);
+	$("#suggestion").html("Hungry? Try <b>"+randomRestaurant[0]+"</b>"); 
+});
+
+
+function initMap() {
+	var ucirvine = {lat: 33.640, lng: -117.844}; 
+	map = new google.maps.Map(document.getElementById('map'), { 
+		zoom: 14, 
+		center: ucirvine
+	});
+}
+
+$("#new").click(function(){
+	var randomNum = getRandomInt(0, restaurants.length-1) 
+	var newRestaurant = restaurants[randomNum]; 
+	restaurantLocation = new google.maps.LatLng(newRestaurant[1], newRestaurant[2]); 
+	addMarker(restaurantLocation, newRestaurant[0]); 
+	$("#suggestion").html("Can't decide where to eat? Try <b>"+newRestaurant[0]+"</b>"); 
+});
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFAmmcG3PXNTzGJENn41sz6ePkIBtwmuU&callback=initMap">
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
